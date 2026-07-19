@@ -1,0 +1,37 @@
+name: daily-instagram-post
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # 10:00 UTC = 19:00 JST
+  workflow_dispatch: {}     # 手動実行も可
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Post to Instagram
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
+        run: python post.py
+
+      - name: Commit queue update
+        run: |
+          git config user.name "autopost-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if ! git diff --quiet queue.json; then
+            git add queue.json
+            git commit -m "mark posted $(date -u +%F)"
+            git push
+          else
+            echo "no queue change"
+          fi

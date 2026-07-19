@@ -22,7 +22,7 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
-        run: python post.py
+        run: python3 post.py
 
       - name: Commit queue update
         run: |

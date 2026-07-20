@@ -18,18 +18,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Post to Instagram
+      - name: Post to Instagram (投資垢 はる)
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
         run: python3 post.py
 
+      - name: Post to Instagram (美容垢 みお)
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN_BIYOU }}
+          REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
+          QUEUE_FILE: biyou/queue.json
+        run: |
+          if [ -z "$IG_TOKEN" ]; then
+            echo "SKIP: IG_TOKEN_BIYOU が未設定のため美容垢の投稿をスキップ"
+          else
+            python3 post.py
+          fi
+
       - name: Commit queue update
         run: |
           git config user.name "autopost-bot"
           git config user.email "actions@users.noreply.github.com"
-          if ! git diff --quiet queue.json; then
-            git add queue.json
+          if ! git diff --quiet queue.json biyou/queue.json; then
+            git add queue.json biyou/queue.json
             git commit -m "mark posted $(date -u +%F)"
             git push
           else

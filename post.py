@@ -3,13 +3,15 @@
 環境変数:
   IG_TOKEN   … Instagramアクセストークン(GitHub Secretsから注入)
   REPO_RAW   … 画像のraw URLベース (例 https://raw.githubusercontent.com/USER/REPO/main)
-投稿後は queue.json の status を "posted" に更新する(コミットはワークフロー側)。
+  QUEUE_FILE … キューのパス(省略時 queue.json。美容垢は biyou/queue.json)
+投稿後は QUEUE_FILE の status を "posted" に更新する(コミットはワークフロー側)。
 """
 import json, os, sys, time, urllib.parse, urllib.request
 
 API = "https://graph.instagram.com/v21.0"
 TOKEN = os.environ["IG_TOKEN"]
 RAW = os.environ["REPO_RAW"].rstrip("/")
+QUEUE_FILE = os.environ.get("QUEUE_FILE", "queue.json")
 
 
 def api_post(path: str, data: dict) -> dict:
@@ -25,7 +27,7 @@ def api_post(path: str, data: dict) -> dict:
 
 
 def main() -> None:
-    with open("queue.json", encoding="utf-8") as f:
+    with open(QUEUE_FILE, encoding="utf-8") as f:
         queue = json.load(f)
 
     post = next((p for p in queue["posts"] if p["status"] == "pending"), None)
@@ -55,7 +57,7 @@ def main() -> None:
     post["status"] = "posted"
     post["media_id"] = published["id"]
     post["posted_at"] = time.strftime("%Y-%m-%d %H:%M JST", time.localtime(time.time() + 9 * 3600 - time.timezone))
-    with open("queue.json", "w", encoding="utf-8") as f:
+    with open(QUEUE_FILE, "w", encoding="utf-8") as f:
         json.dump(queue, f, ensure_ascii=False, indent=2)
         f.write("\n")
 

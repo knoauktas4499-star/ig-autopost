@@ -43,6 +43,32 @@ jobs:
             python3 post.py
           fi
 
+      - name: Story announce (投資垢 はる)
+        # 当日投稿したカルーセルの表紙を告知ストーリーとして流す
+        # (当日分がまだ無い日は story.py 側で NO_STORY となり何もしない)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
+          STORY_MODE: announce
+        run: python3 story.py
+
+      - name: Story announce (美容垢 みお)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN_BIYOU }}
+          REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
+          QUEUE_FILE: biyou/queue.json
+          STORY_MODE: announce
+        run: |
+          if [ -z "$IG_TOKEN" ]; then
+            echo "SKIP: IG_TOKEN_BIYOU が未設定"
+          else
+            python3 story.py
+          fi
+
       - name: Commit queue update
         # 片方が失敗しても、投稿に成功した分のキュー更新は必ず記録する
         # (ここをスキップすると投稿済みなのにpendingのまま残り、翌日に重複投稿される)

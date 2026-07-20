@@ -165,6 +165,46 @@ def page_table(img, d, t, spec):
             my += 46
 
 
+def page_table2(img, d, t, spec):
+    """成分名(太字・大)+説明(1〜2行)の2段組。ラベル列なし。"""
+    f_title = font(FONT_B, 76)
+    f_name = font(FONT_B, 46)
+    f_desc = font(FONT_R, 34)
+
+    rows = spec["rows"]
+    x0, x1 = 70, W - 70
+    row_h = 168
+
+    title_lines = wrap(d, spec["title"], f_title, W - 180)
+    memo_lines = wrap(d, spec.get("memo", ""), font(FONT_R, 32), W - 180) if spec.get("memo") else []
+    table_h = row_h * len(rows)
+    block_h = len(title_lines) * 96 + 40 + table_h + (len(memo_lines) * 46 + 40 if memo_lines else 0)
+    y = SAFE_TOP + max(0, ((H - SAFE_TOP - SAFE_BOTTOM) - block_h) / 2)
+
+    for line in title_lines:
+        center(d, y, line, f_title, t["accent"])
+        y += 96
+    y += 40
+
+    rounded(d, (x0, y, x1, y + table_h), 28, t["panel"])
+    for r, row in enumerate(rows):
+        ry = y + row_h * r
+        d.text((x0 + 40, ry + 34), row["name"], font=f_name, fill=t["accent"])
+        dy = ry + 96
+        for line in wrap(d, row["desc"], f_desc, x1 - x0 - 80):
+            d.text((x0 + 40, dy), line, font=f_desc, fill=t["ink"])
+            dy += 44
+        if r < len(rows) - 1:
+            d.line((x0 + 20, ry + row_h, x1 - 20, ry + row_h), fill=t["line"], width=2)
+
+    if memo_lines:
+        f_memo = font(FONT_R, 32)
+        my = y + table_h + 40
+        for line in memo_lines:
+            center(d, my, line, f_memo, t["sub"])
+            my += 46
+
+
 def page_points(img, d, t, spec):
     f_title = font(FONT_B, 76)
     f_num = font(FONT_B, 38)
@@ -229,7 +269,7 @@ def page_cta(img, d, t, spec):
         center(d, y + bh + 40, spec["hint"], f_hint, t["sub"])
 
 
-DRAW = {"cover": page_cover, "table": page_table, "points": page_points, "cta": page_cta}
+DRAW = {"cover": page_cover, "table": page_table, "table2": page_table2, "points": page_points, "cta": page_cta}
 
 
 def main(spec_path):

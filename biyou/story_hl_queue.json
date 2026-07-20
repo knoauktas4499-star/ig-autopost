@@ -1,10 +1,37 @@
 {
   "_readme": "ハイライト用ストーリーの投稿キュー。status=pendingの先頭から1棚ずつ、その棚の全画像を順にストーリー投稿する。投稿後posted。承認案件で新しい棚を作ったらpendingで末尾に追加する(=止めるまで量産)。",
   "shelves": [
-    { "name": "はじめに", "dir": "biyou/stories/hajimeni", "status": "pending" },
-    { "name": "成分じてん", "dir": "biyou/stories/seibun", "status": "pending" },
-    { "name": "悩み別ガイド", "dir": "biyou/stories/nayami", "status": "pending" },
-    { "name": "プチプラvsデパコス", "dir": "biyou/stories/pripura", "status": "pending" },
-    { "name": "脱毛くらべ", "dir": "biyou/stories/datsumo", "status": "pending" }
+    {
+      "name": "はじめに",
+      "dir": "biyou/stories/hajimeni",
+      "status": "posted",
+      "posted_at": "2026-07-21 01:26 JST",
+      "media_ids": [
+        "17908435944271645",
+        "18121899982750509",
+        "18602797732013868",
+        "18118297166508835"
+      ]
+    },
+    {
+      "name": "成分じてん",
+      "dir": "biyou/stories/seibun",
+      "status": "pending"
+    },
+    {
+      "name": "悩み別ガイド",
+      "dir": "biyou/stories/nayami",
+      "status": "pending"
+    },
+    {
+      "name": "プチプラvsデパコス",
+      "dir": "biyou/stories/pripura",
+      "status": "pending"
+    },
+    {
+      "name": "脱毛くらべ",
+      "dir": "biyou/stories/datsumo",
+      "status": "pending"
+    }
   ]
 }

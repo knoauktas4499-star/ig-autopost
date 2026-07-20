@@ -2,7 +2,12 @@ name: daily-instagram-post
 
 on:
   schedule:
-    - cron: "0 10 * * *"   # 10:00 UTC = 19:00 JST
+    # GitHubのcronはベストエフォートで、毎時0分など混雑する時刻ほど遅延・破棄されやすい。
+    # 分をずらしたうえで3回発火させ、どれか1回が通れば投稿される形にしている。
+    # 2回目以降はpost.py側の同日ガード(ALREADY_POSTED)で自動的にスキップされる。
+    - cron: "12 10 * * *"   # 19:12 JST (本命)
+    - cron: "42 10 * * *"   # 19:42 JST (予備1)
+    - cron: "22 11 * * *"   # 20:22 JST (予備2)
   workflow_dispatch: {}     # 手動実行も可
 
 permissions:

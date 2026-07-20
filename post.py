@@ -7,7 +7,9 @@
 投稿後は QUEUE_FILE の status を "posted" に更新する(コミットはワークフロー側)。
 """
 import json, os, sys, time, urllib.parse, urllib.request
+from datetime import datetime, timedelta, timezone
 
+JST = timezone(timedelta(hours=9))
 API = "https://graph.instagram.com/v21.0"
 TOKEN = os.environ["IG_TOKEN"]
 RAW = os.environ["REPO_RAW"].rstrip("/")
@@ -29,6 +31,12 @@ def api_post(path: str, data: dict) -> dict:
 def main() -> None:
     with open(QUEUE_FILE, encoding="utf-8") as f:
         queue = json.load(f)
+
+    # 予備のcronが発火したとき同じ日に2本投稿しないためのガード
+    today = datetime.now(JST).strftime("%Y-%m-%d")
+    if any(str(p.get("posted_at", "")).startswith(today) for p in queue["posts"]):
+        print(f"ALREADY_POSTED: {today} は投稿済みのためスキップしました。")
+        return
 
     post = next((p for p in queue["posts"] if p["status"] == "pending"), None)
     if post is None:
@@ -56,7 +64,7 @@ def main() -> None:
 
     post["status"] = "posted"
     post["media_id"] = published["id"]
-    post["posted_at"] = time.strftime("%Y-%m-%d %H:%M JST", time.localtime(time.time() + 9 * 3600 - time.timezone))
+    post["posted_at"] = datetime.now(JST).strftime("%Y-%m-%d %H:%M JST")
     with open(QUEUE_FILE, "w", encoding="utf-8") as f:
         json.dump(queue, f, ensure_ascii=False, indent=2)
         f.write("\n")

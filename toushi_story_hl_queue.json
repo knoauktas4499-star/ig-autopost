@@ -1,10 +1,37 @@
 {
   "_readme": "投資垢のハイライト用ストーリー投稿キュー。status=pendingの先頭から1棚ずつ全画像を投稿。承認案件で棚を追加したらpendingで末尾へ。",
   "shelves": [
-    { "name": "はじめに", "dir": "toushi_stories/hajimeni", "status": "pending" },
-    { "name": "新NISAの基本", "dir": "toushi_stories/kihon", "status": "pending" },
-    { "name": "証券くらべ", "dir": "toushi_stories/shoken", "status": "pending" },
-    { "name": "用語じてん", "dir": "toushi_stories/yougo", "status": "pending" },
-    { "name": "NISA Q&A", "dir": "toushi_stories/qa", "status": "pending" }
+    {
+      "name": "はじめに",
+      "dir": "toushi_stories/hajimeni",
+      "status": "posted",
+      "posted_at": "2026-07-21 01:28 JST",
+      "media_ids": [
+        "18141800851547083",
+        "17936294358338885",
+        "18126898282738111",
+        "18023179922852694"
+      ]
+    },
+    {
+      "name": "新NISAの基本",
+      "dir": "toushi_stories/kihon",
+      "status": "pending"
+    },
+    {
+      "name": "証券くらべ",
+      "dir": "toushi_stories/shoken",
+      "status": "pending"
+    },
+    {
+      "name": "用語じてん",
+      "dir": "toushi_stories/yougo",
+      "status": "pending"
+    },
+    {
+      "name": "NISA Q&A",
+      "dir": "toushi_stories/qa",
+      "status": "pending"
+    }
   ]
 }

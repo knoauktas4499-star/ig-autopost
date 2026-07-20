@@ -30,6 +30,8 @@ jobs:
         run: python3 post.py
 
       - name: Post to Instagram (美容垢 みお)
+        # 投資垢が失敗しても美容垢の投稿は独立して試みる
+        if: ${{ !cancelled() }}
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN_BIYOU }}
           REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
@@ -42,6 +44,9 @@ jobs:
           fi
 
       - name: Commit queue update
+        # 片方が失敗しても、投稿に成功した分のキュー更新は必ず記録する
+        # (ここをスキップすると投稿済みなのにpendingのまま残り、翌日に重複投稿される)
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "autopost-bot"
           git config user.email "actions@users.noreply.github.com"

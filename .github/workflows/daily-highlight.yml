@@ -1,0 +1,57 @@
+name: daily-highlight-story
+
+on:
+  schedule:
+    # ハイライト用ストーリーを毎日1棚ずつ投稿する。キューが尽きたら自動で止まり、
+    # 承認案件で新しい棚をpendingで足すと翌日から再開する(=止めるまで量産)。
+    # 通常投稿(19時台)とは時間をずらして朝に出す。
+    - cron: "9 0 * * *"    # 09:09 JST
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-highlight
+  cancel-in-progress: false
+
+jobs:
+  highlight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Post highlight shelf (投資垢 はる)
+        continue-on-error: true
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
+          HL_QUEUE_FILE: toushi_story_hl_queue.json
+        run: python3 story_post.py
+
+      - name: Post highlight shelf (美容垢 みお)
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN_BIYOU }}
+          REPO_RAW: https://raw.githubusercontent.com/${{ github.repository }}/main
+          HL_QUEUE_FILE: biyou/story_hl_queue.json
+        run: |
+          if [ -z "$IG_TOKEN" ]; then
+            echo "SKIP: IG_TOKEN_BIYOU が未設定"
+          else
+            python3 story_post.py
+          fi
+
+      - name: Commit queue update
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "autopost-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if ! git diff --quiet toushi_story_hl_queue.json biyou/story_hl_queue.json; then
+            git add toushi_story_hl_queue.json biyou/story_hl_queue.json
+            git commit -m "highlight story posted $(date -u +%F)"
+            git push
+          else
+            echo "no queue change"
+          fi
